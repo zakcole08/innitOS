@@ -1,4 +1,6 @@
 *.o
 *.bin
 *.img
-*.un
+*.un~
+rootfs/bin/
+rootfs/sbin/
