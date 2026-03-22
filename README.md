@@ -3,7 +3,7 @@ Minimal operating system built on the Linux kernel with a custom shell. Focused 
 
 # Todo
 
-- [ ] Make scripts more robust and customisable
+- [x] Make scripts more robust and customisable
 - [ ] Support different architecures e.g. ARM64
 - [ ] Add C shell with JIT compilation and builtin commands
 - [ ] Add filesystem
@@ -26,5 +26,5 @@ cd innitOS
 ```
 3. Start the VM - this will use your current linux kernel by default
 ```bash
-sudo ./run.sh
+sudo ./run.sh #<optional: /path/to/kernel/vmlinuz>
 ```
