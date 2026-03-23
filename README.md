@@ -7,6 +7,7 @@ Minimal operating system built on the Linux kernel with a custom shell. Focused 
 - [ ] Support different architecures e.g. ARM64
 - [ ] Add C shell with JIT compilation and builtin commands
 - [ ] Add filesystem
+- [ ] Prettify
 
 # Requirements
 
