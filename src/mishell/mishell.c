@@ -1,35 +1,96 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "command.h"
 
-char *version = "v0.1";
+#define TABLE_SIZE 64
 
-Command cmd_list[] = {
-	{"help", cmd_help, "Show help menu"},
-	{"pwd",  cmd_pwd,  "Print working directory"},
-	{NULL,   NULL,     NULL} 
-};
+// Global vars
+char *version = "v0.1";
+int last_exit_status = 0;
+
+Command *hash_table[TABLE_SIZE];
+
+unsigned int hash(char *name) {
+    unsigned int h = 5381;
+    int c;
+    while ((c = *name++)) {
+        h = ((h << 5) + h) + c;
+    }
+    return h % TABLE_SIZE;
+}
+
+void hash_insert(char *name, command_func func, char *help) {
+    unsigned int index = hash(name);
+
+    Command *new_cmd = malloc(sizeof(Command));
+    new_cmd->name = name;
+    new_cmd->func = func;
+    new_cmd->help_text = help;
+
+    while (hash_table[index] != NULL) {
+        index = (index + 1) % TABLE_SIZE;
+    }
+    
+    hash_table[index] = new_cmd;
+}
+
+Command* hash_lookup(char *name) {
+    unsigned int index = hash(name);
+    unsigned int start_index = index;
+
+    while (hash_table[index] != NULL) {
+        if (strcmp(hash_table[index]->name, name) == 0) {
+            return hash_table[index];
+        }
+        index = (index + 1) % TABLE_SIZE;
+        if (index == start_index) break; // We searched the whole table
+    }
+    return NULL;
+}
 
 int main() {
+	// initialise hashtable to NULL
+	for(int i = 0; i < TABLE_SIZE; i++) hash_table[i] = NULL;
+	
+	hash_insert("help", cmd_help, "Show help menu");
+	hash_insert("pwd", cmd_pwd, "Print working directory");
+	hash_insert("echo", cmd_echo, "Print a string");
+
 	char input[1024];
 	printf("innitOS %s\n", version);
 	while (1) {
 		printf("> ");
-		if (!fgets(input, sizeof(input), stdin)) break;
+		if (!fgets(input, sizeof(input), stdin)) {
+			break;
+		}
+		
+		// strip trailing newline char
 		input[strcspn(input, "\n")] = '\0';
 
-		if (strlen(input) == 0) continue;
-
-		int found = 0;
-		for (int i = 0; cmd_list[i].name != NULL; i++) {
-			if (strcmp(input, cmd_list[i].name) == 0) {
-					cmd_list[i].func(0, NULL);
-					found = 1;
-					break;
-			}
+		if (strlen(input) == 0) {
+		 	continue;
 		}
-		if (!found) {
+
+		int arg_limit = 32;
+		char *argv[arg_limit];
+		int argc = 0;
+		char *token = strtok(input, " ");
+
+		while (token != NULL && argc < arg_limit) {
+			argv[argc++] = token;
+			token = strtok(NULL, " ");
+		}
+		// Add null terminator to arg list
+		argv[argc] = NULL;
+		
+		Command *cmd = hash_lookup(argv[0]);
+		if (cmd) {
+			last_exit_status = cmd->func(argc, argv);
+		}
+		else {
 			printf("Unknown command: %s\n", input);
+			last_exit_status = 1;
 		}
 	}
 	return 0;
