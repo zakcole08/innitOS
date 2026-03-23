@@ -2,5 +2,4 @@
 *.bin
 *.img
 *.un~
-rootfs/bin/
-rootfs/sbin/
+rootfs/
