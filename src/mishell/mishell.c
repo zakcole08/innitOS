@@ -89,8 +89,8 @@ int main() {
 			last_exit_status = cmd->func(argc, argv);
 		}
 		else {
-			printf("Unknown command: %s\n", input);
-			last_exit_status = 1;
+			//printf("Unknown command: %s\n", input);
+			last_exit_status = cmd_compile(argc, argv);
 		}
 	}
 	return 0;

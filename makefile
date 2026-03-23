@@ -20,6 +20,9 @@ MISHELL_DST = $(ROOTFS)/bin/mishell
 all: $(IMG)
 
 $(IMG): $(INNIT_DST) $(MISHELL_DST)
+	@echo "Stripping binaries to save space..."
+	strip $(INNIT_DST)
+	strip $(MISHELL_DST)
 	@echo "Creating Image..."
 	mkdir -p $(ROOTFS)/{proc,sys,bin,sbin}
 	cd $(ROOTFS) && find . | cpio -o -H newc | gzip > ../$(IMG)
