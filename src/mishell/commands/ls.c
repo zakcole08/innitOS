@@ -10,13 +10,42 @@ You should have received a copy of the GNU General Public License along with thi
 */
 
 #include <stdio.h>
-#include "command.h"
+#include <stdlib.h>
+#include <dirent.h>
+#include <errno.h>
 
-int cmd_help(int argc, char **argv) {
-	printf("innitOS v0.1\n");
-  printf("help - show this menu\n");
-  printf("pwd  - show current directory\n");
-	printf("echo - print a string\n");
-	printf("ls	 - list files and directories\n");
+int cmd_ls(int argc, char *argv[]) {
+	const char *path;
+	DIR *dir;
+	struct dirent *entry;
+
+	if (argc > 1) {
+		path = argv[1];
+	} else {
+		path = ".";
+	}
+
+	dir = opendir(path);
+	if (dir == NULL) {
+		perror("opendir");
+		return 1;
+	}
+
+	errno = 0;
+	while ((entry = readdir(dir)) != NULL) {
+		printf("%s\n", entry->d_name);
+	}
+
+	if (errno != 0) {
+		perror("readdir");
+		closedir(dir);
+		return 1;
+	}
+
+	if (closedir(dir) == -1) {
+		perror("closedir");
+		return EXIT_FAILURE;
+	}
+
 	return 0;
 }
