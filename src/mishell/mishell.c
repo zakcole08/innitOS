@@ -86,7 +86,7 @@ int main() {
 		 	continue;
 		}
 
-		int arg_limit = 32;
+		int arg_limit = 64;
 		char *argv[arg_limit];
 		int argc = 0;
 		char *token = strtok(input, " ");

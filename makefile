@@ -12,7 +12,7 @@ all: $(DISK_IMG)
 binaries:
 	@mkdir -p rootfs/bin rootfs/sbin rootfs/usr rootfs/tmp rootfs/dev rootfs/proc rootfs/sys
 	$(CC) $(CFLAGS) src/innit.c -o rootfs/sbin/init
-	$(CC) $(CFLAGS) src/mishell/mishell.c src/mishell/commands/*.c -o rootfs/bin/mishell
+	$(CC) $(CFLAGS) src/mishell/mishell.c src/mishell/commands/*.c src/mishell/utils/*.c -o rootfs/bin/mishell
 
 $(GCC_STAMP):
 	@echo "Bundling GCC Toolchain..."
