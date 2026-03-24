@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include "command.h"
-#include "../utils/utils.h"
+#include "../../utils/utils.h"
 
 int cmd_compile(int argc, char **argv) {
 	char code[1024] = {0};

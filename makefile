@@ -11,8 +11,8 @@ all: $(DISK_IMG)
 
 binaries:
 	@mkdir -p rootfs/bin rootfs/sbin rootfs/usr rootfs/tmp rootfs/dev rootfs/proc rootfs/sys
-	$(CC) $(CFLAGS) src/innit.c -o rootfs/sbin/init
-	$(CC) $(CFLAGS) src/mishell/mishell.c src/mishell/commands/*.c src/mishell/utils/*.c -o rootfs/bin/mishell
+	$(CC) $(CFLAGS) src/innit.c src/utils/*.c -o rootfs/sbin/init
+	$(CC) $(CFLAGS) src/mishell/mishell.c src/mishell/commands/*.c src/utils/*.c -o rootfs/bin/mishell
 
 $(GCC_STAMP):
 	@echo "Bundling GCC Toolchain..."
@@ -32,8 +32,6 @@ $(DISK_IMG): binaries $(GCC_STAMP)
 	sudo cp -ra rootfs/* $(MOUNT_DIR)/
 	@# Create basic device nodes so the screen/keyboard work
 	sudo mkdir -p $(MOUNT_DIR)/dev
-	sudo mknod -m 600 $(MOUNT_DIR)/dev/console c 5 1
-	sudo mknod -m 666 $(MOUNT_DIR)/dev/null c 1 3
 	sudo umount $(MOUNT_DIR)
 	@rmdir $(MOUNT_DIR)
 	@echo "Success! Run with: qemu-system-x86_64 -kernel bzImage -drive format=raw,file=$(DISK_IMG) -append \"root=/dev/sda rw\""

@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with thi
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "utils/utils.h"
 
 
 int main(){
@@ -22,10 +23,29 @@ int main(){
 
 		signal(SIGCHLD, SIG_IGN);
 
-		mount("proc", "/proc", "proc", 0, NULL);
-		mount("sysfs", "/sys", "sysfs", 0, NULL);
+		if (mount("proc", "/proc", "proc", 0, NULL) == 0 ) {
+			printf("[OK] Mounted /proc\n");
+		}
+		else {
+			printf("[FAIL] Could not mount /proc");
+		}
+		
+		if (mount("sysfs", "/sys", "sysfs", 0, NULL) == 0) {
+			printf("[OK] Mounted /sys\n");
+		}
+		else {
+			printf("[FAIL] Could not mount /sys");
+		}
+
+		if (mount("devtmpfs", "/dev", "devtmpfs", 0, NULL) == 0) {
+			printf("[OK] Mounted /dev\n");
+		}
+		else {
+			printf("[FAIL] Could not mount /dev");
+		}
+			
 
     while(1) {
-			execl("/bin/mishell", "mishell", NULL);
+			exec("/bin/mishell");
 		}
 }
