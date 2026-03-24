@@ -1,43 +1,44 @@
-CC      = gcc
-CFLAGS  = -Wall -static -Isrc/mishell/commands # -I lets us use #include "command.h" easily
-ROOTFS  = rootfs
-SRC_DIR = src
-IMG     = initramfs.img
+CC = gcc
+CFLAGS = -Wall -static -I src/mishell/commands # Include "command.h"
+DISK_IMG = innitOS.img
+DISK_SIZE = 512
+MOUNT_DIR = ./mnt_disk
 
-INNIT_SRC   = $(SRC_DIR)/innit.c
-MISHELL_MAIN = $(SRC_DIR)/mishell/mishell.c
-COMMAND_SRCS = $(wildcard $(SRC_DIR)/mishell/commands/*.c)
+GCC_URL = https://musl.cc/x86_64-linux-musl-native.tgz
+GCC_STAMP = rootfs/usr/bin/gcc
 
-ALL_SHELL_SRCS = $(MISHELL_MAIN) $(COMMAND_SRCS)
-SHELL_OBJS     = $(ALL_SHELL_SRCS:.c=.o)
+all: $(DISK_IMG)
 
-# Destinations
-INNIT_DST   = $(ROOTFS)/sbin/innit
-MISHELL_DST = $(ROOTFS)/bin/mishell
+binaries:
+	@mkdir -p rootfs/bin rootfs/sbin rootfs/usr rootfs/tmp rootfs/dev rootfs/proc rootfs/sys
+	$(CC) $(CFLAGS) src/innit.c -o rootfs/sbin/init
+	$(CC) $(CFLAGS) src/mishell/mishell.c src/mishell/commands/*.c -o rootfs/bin/mishell
 
-# --- Rules ---
+$(GCC_STAMP):
+	@echo "Bundling GCC Toolchain..."
+	curl -L $(GCC_URL) -o gcc_toolchain.tgz
+	mkdir -p tmp_gcc
+	tar -xzf gcc_toolchain.tgz -C tmp_gcc --strip-components=1
+	cp -ra tmp_gcc/* rootfs/usr/
+	rm -rf tmp_gcc gcc_toolchain.tgz
+	@touch $(GCC_STAMP)
 
-all: $(IMG)
-
-$(IMG): $(INNIT_DST) $(MISHELL_DST)
-	@echo "Stripping binaries to save space..."
-	strip $(INNIT_DST)
-	strip $(MISHELL_DST)
-	@echo "Creating Image..."
-	mkdir -p $(ROOTFS)/{proc,sys,bin,sbin}
-	cd $(ROOTFS) && find . | cpio -o -H newc | gzip > ../$(IMG)
-
-$(MISHELL_DST): $(SHELL_OBJS)
-	@mkdir -p $(ROOTFS)/bin
-	$(CC) $(CFLAGS) -o $@ $(SHELL_OBJS)
-
-$(INNIT_DST): $(INNIT_SRC)
-	@mkdir -p $(ROOTFS)/sbin
-	$(CC) $(CFLAGS) $< -o $@
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(DISK_IMG): binaries $(GCC_STAMP)
+	@echo "Baking Disk Image..."
+	dd if=/dev/zero of=$(DISK_IMG) bs=1M count=$(DISK_SIZE)
+	mkfs.ext4 -F $(DISK_IMG)
+	@mkdir -p $(MOUNT_DIR)
+	sudo mount $(DISK_IMG) $(MOUNT_DIR)
+	sudo cp -ra rootfs/* $(MOUNT_DIR)/
+	@# Create basic device nodes so the screen/keyboard work
+	sudo mkdir -p $(MOUNT_DIR)/dev
+	sudo mknod -m 600 $(MOUNT_DIR)/dev/console c 5 1
+	sudo mknod -m 666 $(MOUNT_DIR)/dev/null c 1 3
+	sudo umount $(MOUNT_DIR)
+	@rmdir $(MOUNT_DIR)
+	@echo "Success! Run with: qemu-system-x86_64 -kernel bzImage -drive format=raw,file=$(DISK_IMG) -append \"root=/dev/sda rw\""
 
 clean:
-	rm -f $(IMG) $(INNIT_DST) $(MISHELL_DST)
-	find . -name "*.o" -type f -delete
+	rm -rf rootfs/usr/* rootfs/bin/* rootfs/sbin/* $(DISK_IMG)
+
+.PHONY: all binaries clean
