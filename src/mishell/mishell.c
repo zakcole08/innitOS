@@ -69,6 +69,7 @@ int main() {
 	hash_insert("echo", cmd_echo, "Print a string");
 	hash_insert("compile", cmd_compile, "Compile and run the C code in the shell");
 	hash_insert("ls", cmd_ls, "List files and directories");
+	hash_insert("cat", cmd_cat, "Concatenate file / Show file contents");
 
 	char input[1024];
 	printf("innitOS %s\n", version);

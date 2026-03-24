@@ -17,6 +17,7 @@ int cmd_help(int argc, char **argv) {
   printf("help - show this menu\n");
   printf("pwd  - show current directory\n");
 	printf("echo - print a string\n");
-	printf("ls	 - list files and directories\n");
+	printf("ls   - list files and directories\n");
+	printf("cat  - concatenate file / show file contents\n");
 	return 0;
 }
