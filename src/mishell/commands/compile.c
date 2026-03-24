@@ -23,11 +23,9 @@ int cmd_compile(int argc, char **argv) {
 	fclose(f);
 
 	int status = exec("/usr/bin/gcc -static /tmp/jit.c -o /tmp/output");
-	if (status == 0) {
-		exec("/tmp/output");
+	if (status != 0) {
+		printf("FAILURE: Input was not a command or valid C syntax\n");
+		return status;
 	}
-	else {
-		printf("GCC exited with error code %d\n", status);
-	}
-	return 0;
+	return exec("/tmp/output");
 }

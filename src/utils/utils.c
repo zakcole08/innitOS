@@ -35,14 +35,15 @@ int exec(const char *command) {
 			execv(args[0], args); 
 			perror("innitOS exec failed");
 			_exit(127);
-	} else {
-			int status;
-			waitpid(pid, &status, 0);
-			free(cmd_copy);
+	}
+	else {
+		int status;
+		waitpid(pid, &status, 0);
+		free(cmd_copy);
 			
-			if (WIFEXITED(status)) {
-					return WEXITSTATUS(status);
-			}
-			return -1;
+		if (WIFEXITED(status)) {
+			return WEXITSTATUS(status);
+		}
+		return -1;
 	}
 }
