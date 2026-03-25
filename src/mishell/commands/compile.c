@@ -9,14 +9,14 @@
 int cmd_compile(int argc, char **argv) {
 	char code[1024] = {0};
 	for (int i = 0; i < argc; i++) {
-			strcat(code, argv[i]);
-			strcat(code, " ");
+		strcat(code, argv[i]);
+		strcat(code, " ");
 	}
 
 	FILE *f = fopen("/tmp/jit.c", "w");
 	if (!f) {
-			printf("Error: Could not create temporary file.\n");
-			return 1;
+		printf("Error: Could not create temporary file.\n");
+		return 1;
 	}
 
 	fprintf(f, "#include <stdio.h>\nint main() { %s; return 0; }\n", code);
@@ -27,5 +27,10 @@ int cmd_compile(int argc, char **argv) {
 		printf("FAILURE: Input was not a command or valid C syntax\n");
 		return status;
 	}
-	return exec("/tmp/output");
+	else {
+		status = exec("/tmp/output");
+		remove("/tmp/output");
+		return status;
+	}
+	return 0;
 }

@@ -15,32 +15,32 @@ int exec(const char *command) {
 
 	char *token = strtok(cmd_copy, " ");
 	while (token != NULL && i < 63) {
-			args[i++] = token;
-			token = strtok(NULL, " ");
+		args[i++] = token;
+		token = strtok(NULL, " ");
 	}
 	args[i] = NULL;
 
 	if (i == 0) {
-			free(cmd_copy);
-			return -1;
+		free(cmd_copy);
+		return -1;
 	}
 
 	pid_t pid = fork();
 	if (pid == -1) {
-			free(cmd_copy);
-			return -1;
+		free(cmd_copy);
+		return -1;
 	}
 
 	if (pid == 0) {
-			execv(args[0], args); 
-			perror("innitOS exec failed");
-			_exit(127);
+		execv(args[0], args); 
+		perror("innitOS exec failed");
+		return 127;
 	}
 	else {
 		int status;
 		waitpid(pid, &status, 0);
 		free(cmd_copy);
-			
+
 		if (WIFEXITED(status)) {
 			return WEXITSTATUS(status);
 		}
