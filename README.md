@@ -4,10 +4,11 @@ Minimal operating system built on the Linux kernel with a custom shell. Focused 
 # Todo
 
 - [x] Make scripts more robust and customisable
-- [ ] Support different architecures e.g. ARM64
 - [ ] Add C shell with JIT compilation and builtin commands
-- [ ] Add filesystem
+- [ ] Support different architecures e.g. ARM64
 - [ ] Prettify
+- [ ] Support networking
+- [ ] Package management
 
 # Requirements
 
