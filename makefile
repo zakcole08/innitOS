@@ -6,6 +6,8 @@ MOUNT_DIR = ./mnt_disk
 
 GCC_URL = https://musl.cc/x86_64-linux-musl-native.tgz
 GCC_STAMP = rootfs/usr/bin/gcc
+TCC_URL = https://github.com/Tiny-C-Compiler/tinycc-mirror-repository.git
+TCC_STAMP = rootfs/usr/bin/tcc
 
 all: $(DISK_IMG)
 
@@ -22,6 +24,15 @@ $(GCC_STAMP):
 	cp -ra tmp_gcc/* rootfs/usr/
 	rm -rf tmp_gcc gcc_toolchain.tgz
 	@touch $(GCC_STAMP)
+
+$(TCC_STAMP):
+	@echo "Building TCC..."
+	@if [ ! -d tmp_tcc ]; then git clone $(TCC_URL) tmp_tcc; fi
+	cd tmp_tcc && ./configure --prefix=/usr
+	cd tmp_tcc && make
+	mkdir -p rootfs/usr/lib rootfs/usr/include rootfs/usr/bin
+	cd tmp_tcc && make install DESTDIR=$(PWD)/rootfs
+	@touch $(TCC_STAMP)
 
 $(DISK_IMG): binaries $(GCC_STAMP)
 	@echo "Baking Disk Image..."

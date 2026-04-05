@@ -22,15 +22,19 @@ int cmd_compile(int argc, char **argv) {
 	fprintf(f, "#include <stdio.h>\nint main() { %s; return 0; }\n", code);
 	fclose(f);
 
-	int status = exec("/usr/bin/gcc -static /tmp/jit.c -o /tmp/output");
+	int status = exec("/usr/bin/tcc -run /tmp/jit.c");
 	if (status != 0) {
 		printf("FAILURE: Input was not a command or valid C syntax\n");
 		return status;
 	}
+<<<<<<< Updated upstream
 	else {
 		status = exec("/tmp/output");
 		remove("/tmp/output");
 		return status;
 	}
 	return 0;
+=======
+	return exec("/usr/bin/tcc -run /tmp/jit.c");
+>>>>>>> Stashed changes
 }

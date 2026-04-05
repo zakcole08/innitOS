@@ -66,11 +66,18 @@ Command* hash_lookup(char *name) {
 }
 
 int main() {
+<<<<<<< Updated upstream
 
 	// initialise hashtable
 	for (int i = 0; i < TABLE_SIZE; i++)
 		hash_table[i] = NULL;
 
+=======
+	// initialise hashtable to NULL
+	for(int i = 0; i < TABLE_SIZE; i++) hash_table[i] = NULL;
+	
+	hash_insert("exec", cmd_exec, "Execute a program");
+>>>>>>> Stashed changes
 	hash_insert("help", cmd_help, "Show help menu");
 	hash_insert("pwd", cmd_pwd, "Print working directory");
 	hash_insert("echo", cmd_echo, "Print a string");
